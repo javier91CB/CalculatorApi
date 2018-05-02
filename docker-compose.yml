@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  calculatorapi:
+    image: calculatorapi
+    ports: 
+      - "7593:80"
+    build:
+      context: .
+      dockerfile: CalculatorApi/Dockerfile
