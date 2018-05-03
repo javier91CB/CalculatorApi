@@ -8,15 +8,16 @@ using Microsoft.AspNetCore.Mvc;
 namespace CalculatorApi.Controllers
 {
     [Produces("application/json")]
-    [Route("api/v1/[Controller]")]
+    [Route("api/v1/calculator")]
     public class CalculatorController : Controller
     {
+
+        private readonly string route = "/api/v1/calculator/";
         // GET: api/Calculator
-        [HttpGet("add/{n?}")]
-        public long add()
+        [HttpGet("add/{*n}")]
+        public long add(string nnn)
         {
-            int count = HttpContext.Request.Path.ToString().LastIndexOf('/');
-            var paramValues = HttpContext.Request.Path.ToString().Remove(0, count + 1).Replace("%2F", "/").Split('/');
+            var paramValues = HttpContext.Request.Path.ToString().ToLower().Replace(route + "add/", "").Split('/');
             long result = long.TryParse(paramValues?.First(), out long n) ? n: default(long);
             foreach (var value in paramValues?.Skip(1))
             {
@@ -26,11 +27,10 @@ namespace CalculatorApi.Controllers
         }
 
         // GET: api/Calculator/5
-        [HttpGet("subs/{n?}")]
+        [HttpGet("subs/{*n}")]
         public long subs()
         {
-            int count = HttpContext.Request.Path.ToString().LastIndexOf('/');
-            var paramValues = HttpContext.Request.Path.ToString().Remove(0, count + 1).Replace("%2F", "/").Split('/');
+            var paramValues = HttpContext.Request.Path.ToString().ToLower().Replace(route + "subs/", "").Split('/');
             long result = long.TryParse(paramValues?.First(), out long n) ? n : default(long);
             foreach (var value in paramValues.Skip(1))
             {
@@ -40,31 +40,36 @@ namespace CalculatorApi.Controllers
         }
 
         // POST: api/Calculator
-        [HttpGet("mult/{n?}")]
+        [HttpGet("mult/{*n}")]
         public long mult()
         {
-            int count = HttpContext.Request.Path.ToString().LastIndexOf('/');
-            var paramValues = HttpContext.Request.Path.ToString().Remove(0, count + 1).Replace("%2F", "/").Split('/');
+            var paramValues = HttpContext.Request.Path.ToString().ToLower().Replace(route + "mult/", "").Split('/');
             long result = long.TryParse(paramValues?.First(), out long n) ? n : default(long);
             foreach (var value in paramValues.Skip(1))
             {
-                result *= long.TryParse(value, out long ne) ? ne : default(long);
+                result *= long.TryParse(value, out long ne) ? ne : default(long) + 1;
             }
             return result;
         }
 
         // PUT: api/Calculator/5
-        [HttpGet("div/{n?}")]
-        public double div()
+        [HttpGet("div/{*n}")]
+        public string div()
         {
-            int count = HttpContext.Request.Path.ToString().LastIndexOf('/');
-            var paramValues = HttpContext.Request.Path.ToString().Remove(0, count + 1).Replace("%2F", "/").Split('/');
+            var paramValues = HttpContext.Request.Path.ToString().ToLower().Replace(route + "div/", "").Split('/');
             double result = long.TryParse(paramValues?.First(), out long n) ? n : default(long);
-            foreach (var value in paramValues.Skip(1))
+            try
             {
-                result /= long.TryParse(value, out long ne) ? ne : default(long);
+                foreach (var value in paramValues.Skip(1))
+                {
+                    result /= long.TryParse(value, out long ne) ? ne : default(long) + 1;
+                }
+                return result.ToString();
             }
-            return result;
+            catch (DivideByZeroException)
+            {
+                return("No Se Permite Division Entre 0");
+            }
         }
     }
 }
